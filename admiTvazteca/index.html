@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Administracion</title>
+  </head>
+  <body>
+    <nav>
+      <div style="display: flex">
+        <img src="images/aztaLogo.png" height="36" alt="18.9" />
+        <h2>Tabla de administración Tvazteca</h2>
+      </div>
+      <div onclick="logout()" class="logout">
+        <span>Cerrar Sesión</span>
+      </div>
+    </nav>
+    <div class="text-center" id="spinner">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div class="container" id="main" style="display: none">
+      <div class="row">
+        <div class="col text-end">
+          <button
+            class="newButton"
+            data-bs-toggle="modal"
+            type="button"
+            data-bs-target="#createModal"
+          >
+            <i class="fas fa-plus-circle"></i> <strong>Nuevo</strong>
+          </button>
+        </div>
+      </div>
+
+      <table class="table" id="table">
+        <caption class="text-center" id="msjRegister">
+          No se encontraron resultados
+        </caption>
+        <thead id="tableHeader">
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Url</th>
+            <th scope="col">Status</th>
+            <th class="colcell">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="idTbody"></tbody>
+      </table>
+
+      <button type="button" class="hidden" id="liveToastBtn"></button>
+
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div
+          id="liveToast"
+          class="toast toast-width"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <div id="headerToast" class="toast-header border-0">
+            <strong id="textToast"></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalCreate">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Editar partner</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col">
+                  <label class="form-label"
+                    >Nombre <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editNamepartner"
+                    onkeyup="detecFields('editar')"
+                  />
+                </div>
+                <div class="col">
+                  <label class="form-label"
+                    >Url <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    onkeyup="detecFields('editar')"
+                    id="editUrl"
+                  />
+                </div>
+                <div class="col">
+                  <label class="form-label"
+                    >PartnerKey <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    onfocusout="focusOut('editar')"
+                    oninput="setValidKey(true)"
+                    onkeyup="detecFields('editar')"
+                    id="editPartnerKey"
+                    class="form-control"
+                    onkeypress="return (event.keyCode != 32)"
+                  />
+                  <small id="msjErrorEdit" class="text-danger"></small>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <div class="section">
+                    <p><strong>Configuración</strong></p>
+                    <hr />
+                  </div>
+                </div>
+              </div>
+              <div class="mt-2">
+                <div class="row">
+                  <div class="col">
+                    <label class="form-label"
+                      >Id etiqueta <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('editar')"
+                      id="editIdtag"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col">
+                    <label class="form-label"
+                      >Numero del canal
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editChannelid"
+                      onfocusout="focusOut('editar')"
+                      oninput="setValidKey(true)"
+                      onkeyup="detecFields('editar')"
+                      onkeypress="return (event.keyCode != 32 && ( (event.keyCode >= 48) && (event.keyCode <=57) ))"
+                    />
+                    <small id="msjErrorEditCanal" class="text-danger"></small>
+                  </div>
+                  <div class="col">
+                    <label for=""></label>
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Status</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="editStatus"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <label class="form-label"
+                      >Link aviso de privacidad
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('editar')"
+                      class="form-control"
+                      id="editarLink"
+                    />
+                  </div>
+                  <div class="col">
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Login</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="editIdLogin"
+                      />
+                    </div>
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Login anonimo</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="editLoginAnonimo"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <div class="section">
+                    <p><strong>Redes Sociales</strong></p>
+                    <hr />
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-6">
+                  <label class="form-label"
+                    >Google Client Id
+                    <span id="editGoogleHidden" class="text-danger"
+                      >*</span
+                    ></label
+                  >
+                  <input
+                    type="text"
+                    onkeyup="detecFields('editar')"
+                    class="form-control"
+                    id="editIdGoogle"
+                  />
+                </div>
+                <div class="col center-checkbox">
+                  <label class="form-label">Inactivo</label>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="editGoogleCheckbox"
+                    value=""
+                    onclick="disabledCheckGoogle('editar')"
+                  />
+                </div>
+                <div class="col-4"></div>
+              </div>
+              <hr />
+              <div class="row mt-2">
+                <div class="col-6">
+                  <div>
+                    <label class="form-label"
+                      >Facebook Client Id
+                      <span id="editFacebookHidden" class="text-danger"
+                        >*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('editar')"
+                      class="form-control"
+                      id="editIdFacebook"
+                    />
+                  </div>
+                  <div class="mt-2">
+                    <label class="form-label"
+                      >Facebook Secret Id
+                      <span id="editSecretFacebookHidden" class="text-danger"
+                        >*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('editar')"
+                      class="form-control"
+                      id="editIdSecretFacebook"
+                    />
+                  </div>
+                </div>
+
+                <div class="col center-checkbox">
+                  <label class="form-label">Inactivo</label>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value=""
+                    id="editFacebookCheckbox"
+                    onclick="disabledCheckFacebook('editar')"
+                  />
+                </div>
+                <div class="col-4"></div>
+              </div>
+              <input type="hidden" id="index" />
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                id="editPartner"
+                onclick="editarPartner()"
+                data-bs-dismiss="modal"
+                class="btn btn-primary"
+              >
+                Guardar cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="createModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modalCreate">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">
+                Agregar partner
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col">
+                  <label class="form-label"
+                    >Nombre <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    onkeyup="detecFields('crear')"
+                    class="form-control"
+                    id="newNamePartner"
+                  />
+                </div>
+                <div class="col">
+                  <label class="form-label"
+                    >Url <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    onkeyup="detecFields('crear')"
+                    class="form-control"
+                    id="newUrl"
+                  />
+                </div>
+                <div class="col">
+                  <label class="form-label"
+                    >PartnerKey <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    onfocusout="focusOut('crear')"
+                    oninput="setValidKey(true)"
+                    onkeyup="detecFields('crear')"
+                    class="form-control"
+                    id="unique"
+                    onkeypress="return (event.keyCode != 32)"
+                  />
+                  <small id="msjError" class="text-danger"></small>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <div class="section">
+                    <p><strong>Configuración</strong></p>
+                    <hr />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-2">
+                <div class="row">
+                  <div class="col">
+                    <label class="form-label"
+                      >Id etiqueta <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('crear')"
+                      class="form-control"
+                      id="idTag"
+                    />
+                  </div>
+                  <div class="col">
+                    <label class="form-label"
+                      >Numero del canal
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      onfocusout="focusOut('crear')"
+                      oninput="setValidKey(true)"
+                      onkeyup="detecFields('crear')"
+                      id="channelId"
+                      onkeypress="return (event.keyCode != 32 && ( (event.keyCode >= 48) && (event.keyCode <=57) ))"
+                    />
+                    <small id="msjErrorCanal" class="text-danger"></small>
+                  </div>
+                  <div class="col">
+                    <label for=""></label>
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Status</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="status"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <label class="form-label"
+                      >Link aviso de privacidad
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('crear')"
+                      class="form-control"
+                      id="link"
+                    />
+                  </div>
+
+                  <div class="col">
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Login</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="login"
+                      />
+                    </div>
+                    <div
+                      class="form-check form-switch"
+                      style="margin-top: 15px"
+                    >
+                      <label class="form-label">Login anonimo</label>
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="loginAnonimo"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col">
+                  <div class="section">
+                    <p><strong>Redes Sociales</strong></p>
+                    <hr />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-6">
+                  <label class="form-label"
+                    >Google Client Id
+                    <span id="googleHidden" class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    onkeyup="detecFields('crear')"
+                    class="form-control"
+                    id="idGoogle"
+                  />
+                </div>
+                <div class="col center-checkbox">
+                  <label class="form-label">Inactivo</label>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="googleCheckbox"
+                    value=""
+                    onclick="disabledCheckGoogle('crear')"
+                  />
+                </div>
+                <div class="col-4"></div>
+              </div>
+              <hr />
+              <div class="row mt-2">
+                <div class="col-6">
+                  <div>
+                    <label class="form-label"
+                      >Facebook Client Id
+                      <span id="facebookHidden" class="text-danger"
+                        >*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('crear')"
+                      class="form-control"
+                      id="idFacebook"
+                    />
+                  </div>
+                  <div class="mt-2">
+                    <label class="form-label"
+                      >Facebook Secret Id
+                      <span id="secretFacebookHidden" class="text-danger"
+                        >*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      onkeyup="detecFields('crear')"
+                      class="form-control"
+                      id="IdSecretFacebook"
+                    />
+                  </div>
+                </div>
+                <div class="col center-checkbox">
+                  <label class="form-label">Inactivo</label>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="facebookCheckbox"
+                    value=""
+                    onclick="disabledCheckFacebook('crear')"
+                  />
+                </div>
+                <div class="col-4"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+                onclick="resetField()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                id="savePartner"
+                onclick="createPartner()"
+                data-bs-dismiss="modal"
+                class="btn btn-primary"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"
+  ></script>
+  <script src="app.js"></script>
+</html>
